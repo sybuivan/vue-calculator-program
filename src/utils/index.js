@@ -22,3 +22,12 @@ export const calculateResult = (data) => {
 
   return sum;
 };
+
+export const checkError = (arr) => {
+  const pattern = /(\+\+|--)/g;
+  return pattern.test(arr.join(''));
+};
+
+export const checkOperator = (showInput, length) => {
+  return ['+', '-', '*', '/'].includes(showInput[length - 1]);
+};

@@ -77,7 +77,7 @@
 
 <script>
 import KeyItem from '../../components/key-item/index.vue';
-import { calculateResult } from '../../utils/index';
+import { calculateResult, checkError, checkOperator } from '../../utils/index';
 import { numberData } from './data';
 export default {
   components: {
@@ -97,11 +97,12 @@ export default {
   },
   methods: {
     removeLastOperators() {
-      while (
-        ['+', '-', '*', '/'].includes(this.showInput[this.showInput.length - 1])
-      ) {
+      while (checkOperator(this.showInput, this.showInput.length)) {
         this.showInput.pop();
       }
+    },
+    clearSelectedNumber() {
+      this.selectedNumber = null;
     },
     handleClick(value) {
       this.input += value;
@@ -116,58 +117,76 @@ export default {
     handleOperator(operator) {
       if (this.input) this.showInput.push(this.input);
       switch (operator) {
-        case '+':
+        case '+': {
+          this.removeLastOperators();
           this.showInput.push('+');
           break;
-        case '-':
+        }
+        case '-': {
+          this.removeLastOperators();
           this.showInput.push('-');
           break;
-        case '*':
+        }
+        case '*': {
+          this.removeLastOperators();
           this.showInput.push('*');
           break;
-        case '/':
+        }
+        case '/': {
+          this.removeLastOperators();
           this.showInput.push('/');
           break;
+        }
         default:
           this.result = 0;
       }
       this.input = '';
-      this.disable = true;
       this.disableNumber = false;
       this.$refs.myInput.focus();
+      this.clearSelectedNumber();
     },
 
     handleEqual() {
       if (this.input) {
         this.showInput.push(this.input);
       }
-      this.result = calculateResult(this.showInput);
+
       this.input = '';
       this.selectedNumber = null;
       this.disable = false;
       this.disableNumber = true;
-
       this.removeLastOperators();
+      const hasError = checkError(this.showInput);
+      if (hasError) {
+        return (this.result = 'Lỗi phép tính');
+      }
+      this.result = calculateResult(this.showInput);
+      this.clearSelectedNumber();
     },
     handleRefresh() {
       this.input = '';
       this.result = '';
       this.showInput = [];
       this.disableNumber = false;
+      this.clearSelectedNumber();
     },
     handleDot() {
       if (this.input.includes('.')) return alert('Lỗi số nhập vào');
       this.input += '.';
+      this.clearSelectedNumber();
     },
 
     handleDelete() {
-      this.disableNumber = false;
+      this.clearSelectedNumber();
       this.disable = false;
-      if (this.input) return (this.input = this.input.slice(0, -1));
 
       if (this.showInput.length > 0) {
         this.showInput.pop();
       }
+      if (checkOperator(this.showInput, this.showInput.length)) {
+        this.disableNumber = false;
+      }
+      if (this.input) return (this.input = this.input.slice(0, -1));
     },
   },
 };
