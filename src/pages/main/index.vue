@@ -147,8 +147,6 @@ export default {
       this.disable = false;
       this.disableNumber = true;
 
-      console.log(this.disableNumber);
-
       this.removeLastOperators();
     },
     handleRefresh() {
@@ -164,6 +162,7 @@ export default {
 
     handleDelete() {
       this.disableNumber = false;
+      this.disable = false;
       if (this.input) return (this.input = this.input.slice(0, -1));
 
       if (this.showInput.length > 0) {
